@@ -41,7 +41,7 @@ export async function initDB() {
  * @param {IDBDatabase} db
  * @returns {boolean} Returns `true` if db is empty, `false` if db is not empty.
  */
-export function isEmptyDB(db) {
+export async function isEmptyDB(db) {
   return new Promise((resolve, reject) => {
     let tx;
     let store;
@@ -49,7 +49,8 @@ export function isEmptyDB(db) {
     try {
       tx = db.transaction("memories", "readonly");
       store = tx.objectStore("memories");
-    } catch (err) {
+    } 
+    catch (err) {
       reject(err);
     }
 

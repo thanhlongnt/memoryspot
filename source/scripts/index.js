@@ -77,5 +77,6 @@ async function init() {
       tag.style.color = "white";
     }
   });
+  
   initMapDisplay();
 }

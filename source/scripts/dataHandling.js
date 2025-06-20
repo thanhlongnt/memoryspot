@@ -1,5 +1,5 @@
 import * as dhf from "./dataHandlingFunctions.js";
-import { getPlace, initCreate } from "./create.js";
+import { getPlace, initCreate } from "./map.js";
 import { retrieveMemory, initDB } from "./dataHandlingFunctions.js";
 
 let postId;
@@ -12,7 +12,6 @@ window.addEventListener("DOMContentLoaded", await init);
 /**
  * This function sets up the database, loads form data, and initializes location input.
  */
-
 async function init() {
   db = await initDB();
   document.getElementById("memory-form").addEventListener("submit", submitForm);
@@ -25,7 +24,6 @@ async function init() {
 /**
  * This function previews the uploaded image and makes sure only one file is selected.
  */
-
 function changeImg() {
   const imageInput = document.getElementById("imageUpload");
   const imagePreview = document.getElementById("imagePreview");
@@ -52,9 +50,35 @@ function changeImg() {
  *This function handles form submission and saves or updates the memory in the database.
  * @param {Event} event The form submission event.
  */
-
 async function submitForm(event) {
   event.preventDefault();
+
+  const post = await getPost();
+
+  if (confirmSafety(post)) {
+    // post is valid to submit
+    // future considerations; should really clear the form only when the post is successfully added
+    const newPost = dhf.addMemory(post, db, postId);
+    if (newPost) {
+      event.target.reset(); // resets form to the original state
+      window.location.href = "index.html";
+    } 
+    else {
+      // post not received by MemoryDB
+      event.target.reset(); // resets form to the original state
+      window.location.href = "404.html";
+    }
+  } 
+  
+  else {
+    // post is not valid to submit
+    alert(
+      "Your post is not valid to submit! Please double check and make sure you have an image, a title, and a mood.",
+    );
+  }
+}
+
+async function getPost(){
   let form = document.getElementById("memory-form");
   const data = new FormData(form);
   const title = data.get("title");
@@ -71,7 +95,8 @@ async function submitForm(event) {
   //If the user picked a new image, convert and save it
   if (imageInput.files && imageInput.files.length > 0) {
     imageURL = await dhf.fileToDataUrl(imageInput.files[0]);
-  } else {
+  } 
+  else {
     //if not just use the original image we backed up
     imageURL = imagePreview.dataset.original || imagePreview.src;
   }
@@ -95,24 +120,7 @@ async function submitForm(event) {
     mood: moodTags,
   };
 
-  if (confirmSafety(post)) {
-    // post is valid to submit
-    // future considerations; should really clear the form only when the post is successfully added
-    const newPost = dhf.addMemory(post, db, postId);
-    if (newPost) {
-      event.target.reset(); // resets form to the original state
-      window.location.href = "index.html";
-    } else {
-      // post not received by MemoryDB
-      event.target.reset(); // resets form to the original state
-      window.location.href = "404.html";
-    }
-  } else {
-    // post is not valid to submit
-    alert(
-      "Your post is not valid to submit! Please double check and make sure you have an image, a title, and a mood.",
-    );
-  }
+  return post;
 }
 
 /**

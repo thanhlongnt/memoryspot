@@ -2,7 +2,6 @@
 Core visual part for constructing and saving memory cards
 */
 import { cardTemplate } from "./cardTemplate.js";
-import { retrieveMemory } from "./dataHandlingFunctions.js";
 
 // Custom MemoryData tag utilizing Shadow DOM
 class MemoryData extends HTMLElement {

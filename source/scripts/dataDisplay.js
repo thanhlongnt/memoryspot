@@ -1,48 +1,21 @@
-import { cardTemplate } from "./cardTemplate.js";
-import { isEmptyDB } from "./dataHandlingFunctions.js";
-import { deleteMemory } from "./dataHandlingFunctions.js";
-
-// Store and Display a "Memory" using IndexedDB Issue # 30
+import { isEmptyDB, deleteMemory, initDB } from "./dataHandlingFunctions.js";
 
 // making sure all the content is loaded before handling the DB
-window.addEventListener("DOMContentLoaded", () => {
-  const request = indexedDB.open("MemoryDB", 1); // opening DB version 1
+window.addEventListener("DOMContentLoaded", init);
 
-  // if database does not exist
-  request.onupgradeneeded = (event) => {
-    const db = request.result;
+async function init(){
+  let db = await initDB();
 
-    if (!db.objectStoreNames.contains("memories")) {
-      const store = db.createObjectStore("memories", {
-        keyPath: "post_id",
-        autoIncrement: true,
-      });
-
-      store.createIndex("dateCreated", "dateCreated", { unique: false }); // for sorting by date/getting most recent
-    }
-  };
-
-  let db; // NOTE FOR DISCUSSION: NOT PERSISTED ATM?
-
-  request.onsuccess = (event) => {
-    db = event.target.result;
-    displayAllMemories(db);
-  };
-
-  request.onerror = (event) => {
-    console.error("db err"); // works so far, seen
-  };
+  displayAllMemories(db);
 
   // event listeners to do the filtering logic
   const moodChange = document.getElementById("mood-search");
-
-  // filtering logic should only apply if there is a filter bar
-  if (moodChange) {
+  if (moodChange){
     moodChange.addEventListener("change", () => {
       displayAllMemories(db);
     });
   }
-});
+}
 
 /**
  * This function is written to display all the memories from date descending.
@@ -52,61 +25,78 @@ window.addEventListener("DOMContentLoaded", () => {
  * @param {IDBDatabase} db Database instance
  *
  */
-function displayAllMemories(db) {
-  isEmptyDB(db).then((empty) => {
-    const display = document.querySelector("memories-grid");
-    display.innerHTML = ``; // to clear out the current cards
-    if (empty) {
-      return;
-    } else {
-      // getting the filters
-      const currentMood = document.getElementById("mood-search");
-      let moodFilter;
-      if (currentMood) {
-        moodFilter = currentMood.value;
-      } else {
-        moodFilter = "All Moods"; // display all by default
+async function displayAllMemories(db) {
+  let empty = await isEmptyDB(db);
+  if (empty) {
+    return;
+  } 
+
+  const display = document.querySelector("memories-grid");
+  display.innerHTML = ``; // to clear out the current cards
+
+  let moodFilter = getFilter();
+  
+  loadMemories(display, db, moodFilter);
+}
+
+function getFilter(){
+  // getting the filters
+  const currentMood = document.getElementById("mood-search");
+  let moodFilter;
+  
+  if (currentMood) {
+    moodFilter = currentMood.value;
+  } 
+  else {
+    moodFilter = "All Moods"; // display all by default
+  }
+
+  return moodFilter;
+}
+
+function loadMemories(display, db, moodFilter){
+  const tx = db.transaction("memories", "readonly");
+  const store = tx.objectStore("memories").index("dateCreated");
+  const request = store.openCursor(null, "prev");
+  let cnt = 0;
+  
+  request.onsuccess = (event) => {
+    const cursor = event.target.result;
+    if (cursor) {
+      cnt += 1;
+      const post = cursor.value;
+      if (moodFilter == "All Moods" || post.mood == moodFilter) {
+        const card = createCard(post);
+        display.appendChild(card);
+        setDeleteListener(card, post.post_id, db);
+        setEditListener(card, post.post_id);
       }
-      const tx = db.transaction("memories", "readonly");
-      const store = tx.objectStore("memories").index("dateCreated");
-      const request = store.openCursor(null, "prev");
-      let cnt = 0;
-      request.onsuccess = (event) => {
-        const cursor = event.target.result;
-        if (cursor) {
-          cnt += 1;
-          const post = cursor.value;
-          if (moodFilter == "All Moods" || post.mood == moodFilter) {
-            //create a card for the post
-            const card = document.createElement("memory-data");
-            card.setAttribute("card_id", post.post_id);
-            card.setAttribute("img", post.image);
-            card.setAttribute("img_alt", post.description || "memory image");
-            card.setAttribute("date", post.dateCreated);
-            card.setAttribute("mood", post.mood);
-            card.setAttribute("title", post.title);
-            card.setAttribute("link", post.link);
-            card.setAttribute("description", post.description);
-            card.setAttribute(
-              "location",
-              post.location || "No Location Provided",
-            );
-
-            display.appendChild(card);
-            setTimeout(() => {
-              deleteListener(card, post.post_id, db);
-              editListener(card, post.post_id, db);
-            }, 0);
-          }
-          cursor.continue();
-        }
-      };
-
-      request.onerror = () => {
-        console.error("unable to open cursor");
-      };
+      cursor.continue();
     }
-  });
+  };
+
+  request.onerror = () => {
+    console.error("unable to open cursor");
+  };
+}
+
+
+function createCard(post) {
+  const card = document.createElement("memory-data");
+  card.setAttribute("card_id", post.post_id);
+  card.setAttribute("img", post.image);
+  card.setAttribute("img_alt", post.description || "memory image");
+  card.setAttribute("date", post.dateCreated);
+  card.setAttribute("mood", post.mood);
+  card.setAttribute("title", post.title);
+  card.setAttribute("link", post.link);
+  card.setAttribute("description", post.description);
+  card.setAttribute(
+    "location",
+    post.location || "No Location Provided",
+  );
+
+  return card;
 }
 
 /**
@@ -116,7 +106,7 @@ function displayAllMemories(db) {
  * @param {*} id to delete from IndexedDB
  * @param {*} db Database instance
  */
-function deleteListener(cardElement, id, db) {
+function setDeleteListener(cardElement, id, db) {
   const deleteBtn = cardElement.shadowRoot.querySelector("#delete-btn");
   if (deleteBtn) {
     deleteBtn.addEventListener("click", () => {
@@ -136,9 +126,8 @@ function deleteListener(cardElement, id, db) {
  *
  * @param {*} cardElement to edit from DOM
  * @param {*} id to edit from IndexedDB
- * @param {*} db Database instance
  */
-function editListener(cardElement, id, db) {
+function setEditListener(cardElement, id) {
   const editBtn = cardElement.shadowRoot.querySelector("#edit-btn");
   if (editBtn) {
     editBtn.addEventListener("click", () => {

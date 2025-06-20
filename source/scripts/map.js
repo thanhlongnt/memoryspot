@@ -16,6 +16,10 @@ let map = null;
 const API_KEY_STORAGE = "googleMapsApiKLey";
 let db = null;
 
+let autocomplete;
+let place;
+
+
 /*---------General Google Maps API functions---------*/
 
 /**
@@ -41,8 +45,9 @@ export function loadGoogleMaps(apiKey, lib = "", removeInput = true) {
       reject(new Error("Failed to load Google Maps API"));
     };
 
+    document.head.appendChild(script);
+
     if (removeInput) {
-      document.head.appendChild(script);
       document.getElementById("apiKeyInput").remove();
       document.getElementById("apiKeyPrompt").remove();
       document.getElementById("loadMapBtn").remove();
@@ -88,10 +93,10 @@ export async function initMapDisplay() {
     const savedApiKey = localStorage.getItem(API_KEY_STORAGE);
     try {
       if (savedApiKey) {
-        loadGoogleMaps(savedApiKey, "marker").then(() => {
-          initMap();
-          populateMap(map, db);
-        });
+        await loadGoogleMaps(savedApiKey, "marker")
+        initMap();
+        populateMap(map, db);
+        resolve()
       }
     } catch (err) {
       reject(err);
@@ -148,4 +153,53 @@ function addMarker(map, lat, lng, title = "") {
     map: map,
     position: { lat, lng },
   });
+}
+
+/*---------------Auto Complete Functions---------------*/
+
+/**
+ * Function run upon loading the page -- API key saved in localStorage
+ * is sought after, then initAutocomplete() is run to hook up address search
+ * box
+ */
+export async function initCreate() {
+  const savedApiKey = localStorage.getItem(API_KEY_STORAGE);
+  if (savedApiKey) {
+    await loadGoogleMaps(savedApiKey, "places", false)
+    initAutocomplete();
+  }
+}
+
+/**
+ * Initializes the Google Places Autocomplete widget on the input element with id "location".
+ * Configures autocomplete to restrict results to US geocoded addresses and limits the
+ * fields returned to optimize performance.
+ * Function sets up search bar, currently set to US locations only.
+ */
+function initAutocomplete() {
+  const input = document.getElementById("location");
+  autocomplete = new google.maps.places.Autocomplete(input, {
+    types: ["geocode"], // or use ['establishment'] or ['(regions)'] for different types of places
+    componentRestrictions: { country: "us" }, // Restrict to US, remove if you want worldwide
+    fields: ["address_components", "geometry", "formatted_address"], // Limit returned data for efficiency
+  });
+
+  autocomplete.addListener("place_changed", onPlaceChanged);
+}
+
+/**
+ * Callback fired when the user selects a place from the autocomplete suggestions.
+ * It retrieves place details and logs relevant information, or warns if no geometry is available.
+ */
+function onPlaceChanged() {
+  place = autocomplete.getPlace();
+
+  if (!place.geometry) {
+    // User entered something that was not suggested
+    return;
+  }
+}
+
+export function getPlace() {
+  return place;
 }

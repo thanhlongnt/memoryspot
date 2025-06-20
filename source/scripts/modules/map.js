@@ -1,4 +1,4 @@
-import { getAllLocations, initDB } from "./dataHandlingFunctions.js";
+import { getAllLocations, initDB } from "./dbFunctions.js";
 // Implement Base Map Issue #32
 
 /*---------Global Variables---------*/

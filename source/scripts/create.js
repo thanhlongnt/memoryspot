@@ -1,13 +1,15 @@
-import * as dhf from "./dataHandlingFunctions.js";
-import { getPlace, initCreate } from "./map.js";
-import { retrieveMemory, initDB } from "./dataHandlingFunctions.js";
+import * as dhf from "./modules/dbFunctions.js";
+import { getPlace, initCreate } from "./modules/map.js";
+import { retrieveMemory, initDB } from "./modules/dbFunctions.js";
 
 let postId;
 let lat = null;
 let long = null;
 let db = null;
 
-window.addEventListener("DOMContentLoaded", await init);
+window.addEventListener("DOMContentLoaded", async () => {
+  await init()
+});
 
 /**
  * This function sets up the database, loads form data, and initializes location input.

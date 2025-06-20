@@ -1,21 +1,4 @@
-import { isEmptyDB, deleteMemory, initDB } from "./dataHandlingFunctions.js";
-
-// making sure all the content is loaded before handling the DB
-window.addEventListener("DOMContentLoaded", init);
-
-async function init(){
-  let db = await initDB();
-
-  displayAllMemories(db);
-
-  // event listeners to do the filtering logic
-  const moodChange = document.getElementById("mood-search");
-  if (moodChange){
-    moodChange.addEventListener("change", () => {
-      displayAllMemories(db);
-    });
-  }
-}
+import { isEmptyDB, deleteMemory } from "./dbFunctions.js";
 
 /**
  * This function is written to display all the memories from date descending.
@@ -25,7 +8,7 @@ async function init(){
  * @param {IDBDatabase} db Database instance
  *
  */
-async function displayAllMemories(db) {
+export async function displayAllMemories(db) {
   let empty = await isEmptyDB(db);
   if (empty) {
     return;

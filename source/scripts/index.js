@@ -3,7 +3,9 @@
  * - initMapDisplay: initializes the map display.
  * - insertAPIKey: handles user input of an API key.
  */
-import { initMapDisplay, insertAPIKey } from "./map.js";
+import { initMapDisplay, insertAPIKey } from "./modules/map.js";
+import { initDB } from "./modules/dbFunctions.js";
+import { displayAllMemories } from "./modules/dataDisplay.js";
 
 // Run the init() function when the page has loaded
 window.addEventListener("DOMContentLoaded", async () => {
@@ -23,7 +25,6 @@ window.addEventListener("DOMContentLoaded", async () => {
  * @function
  * @returns {Promise<void>}
  */
-
 async function init() {
   /**
    * Adds a click event listener to the "Load Map" button
@@ -77,6 +78,9 @@ async function init() {
       tag.style.color = "white";
     }
   });
-  
+
   initMapDisplay();
+
+  let db = await initDB();
+  displayAllMemories(db); 
 }

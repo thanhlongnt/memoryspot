@@ -1,0 +1,116 @@
+.card {
+  height: 420px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid #ddd;
+  border-radius: 1em;
+  box-shadow: 0.25em 0.25em 0.5em rgba(0, 0, 0, 0.05);
+}
+
+.photo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  overflow: hidden;
+  background-color: #ddd;
+  flex-shrink: 0;
+}
+
+.photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75em;
+  flex: 1;
+  min-height: 0;
+}
+
+.meta {
+  display: flex;
+  align-items: center;
+  padding: 0.75em 0;
+  gap: 0.5em;
+}
+
+.mood {
+  padding: 0.25em 0.5em;
+  border-radius: 1em;
+  font-weight: bold;
+  color: #fff;
+  font-size: 0.85em;
+}
+
+.date {
+  margin-right: auto;
+  font-size: 0.85em;
+  color: #555;
+}
+
+.actions {
+  display: flex;
+  gap: 0.25em;
+}
+
+.actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.25em;
+  font-size: 1em;
+  border-radius: 0.5em;
+}
+
+.actions button:hover {
+  background: #ddd;
+}
+
+.title {
+  margin: 0;
+  font-weight: normal;
+  font-size: 1.1em;
+}
+
+.description {
+  margin: 0;
+  padding-top: 0.5em;
+  padding-bottom: 1em;
+  font-size: 0.9em;
+  color: #555;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 4.5em;
+  line-height: 1.5em;
+  word-break: break-word;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  margin-top: auto;
+  padding-top: 1em;
+  font-size: 0.85em;
+  color: #555;
+  border-top: 1px solid #ddd;
+}
+
+@media (max-width: 768px) {
+  .card {
+    height: auto;
+  }
+
+  .photo {
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+}

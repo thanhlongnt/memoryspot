@@ -1,0 +1,30 @@
+:root {
+  --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif;
+  --nav-background: #374869;
+  --nav-text: #ffffff;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: var(--font-family);
+  background: #f9f9f9;
+  color: #333;
+}
+
+#root {
+  height: 100%;
+}
+
+button {
+  font-family: inherit;
+}

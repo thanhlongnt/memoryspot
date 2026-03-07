@@ -3,9 +3,9 @@ import { Link } from "react-router-dom";
 import MemoryGrid from "./MemoryGrid.jsx";
 import styles from "./Sidebar.module.css";
 
-export default function Sidebar({ memories, onClose, onDelete, onEdit }) {
+export default function Sidebar({ memories, isOpen, onClose, onDelete, onEdit }) {
   return (
-    <aside className={styles.aside}>
+    <aside className={`${styles.aside} ${isOpen ? styles.open : ""}`}>
       <header className={styles.header}>
         <h2>Your Memories</h2>
         <div className={styles.headerActions}>

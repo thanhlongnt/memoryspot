@@ -3,9 +3,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  border: 1px solid #ddd;
+  border: 1px solid var(--color-border);
   border-radius: 1em;
-  box-shadow: 0.25em 0.25em 0.5em rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-xs);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
 }
 
 .photo {
@@ -16,12 +22,32 @@
   overflow: hidden;
   background-color: #ddd;
   flex-shrink: 0;
+  position: relative;
 }
 
 .photo img {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transition: transform var(--transition-slow);
+}
+
+.card:hover .photo img {
+  transform: scale(1.04);
+}
+
+.moodBadge {
+  position: absolute;
+  top: var(--space-sm);
+  left: var(--space-sm);
+  padding: 0.25em 0.6em;
+  border-radius: var(--radius-pill);
+  font-weight: var(--font-weight-semibold);
+  color: #fff;
+  font-size: 0.78em;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  backdrop-filter: blur(4px);
 }
 
 .content {
@@ -39,18 +65,10 @@
   gap: 0.5em;
 }
 
-.mood {
-  padding: 0.25em 0.5em;
-  border-radius: 1em;
-  font-weight: bold;
-  color: #fff;
-  font-size: 0.85em;
-}
-
 .date {
   margin-right: auto;
   font-size: 0.85em;
-  color: #555;
+  color: var(--color-text-muted);
 }
 
 .actions {
@@ -58,22 +76,43 @@
   gap: 0.25em;
 }
 
-.actions button {
-  background: none;
+.actionBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2em;
+  height: 2em;
   border: none;
-  cursor: pointer;
-  padding: 0.25em;
-  font-size: 1em;
   border-radius: 0.5em;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
 }
 
-.actions button:hover {
-  background: #ddd;
+.actionBtn:hover {
+  transform: scale(1.08);
+}
+
+.editBtn {
+  background: #eef2ff;
+  color: #374869;
+}
+
+.editBtn:hover {
+  background: #d6dfff;
+}
+
+.deleteBtn {
+  background: #fff0f0;
+  color: #c0392b;
+}
+
+.deleteBtn:hover {
+  background: #ffd6d6;
 }
 
 .title {
   margin: 0;
-  font-weight: normal;
+  font-weight: var(--font-weight-semibold);
   font-size: 1.1em;
 }
 
@@ -82,15 +121,15 @@
   padding-top: 0.5em;
   padding-bottom: 1em;
   font-size: 0.9em;
-  color: #555;
+  color: var(--color-text-muted);
+  line-height: 1.6;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-height: 4.5em;
-  line-height: 1.5em;
+  max-height: 4.8em;
   word-break: break-word;
 }
 
@@ -100,8 +139,8 @@
   margin-top: auto;
   padding-top: 1em;
   font-size: 0.85em;
-  color: #555;
-  border-top: 1px solid #ddd;
+  color: var(--color-text-muted);
+  border-top: 1px solid var(--color-border);
 }
 
 @media (max-width: 768px) {

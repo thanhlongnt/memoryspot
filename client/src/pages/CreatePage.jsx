@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { Autocomplete } from "@react-google-maps/api";
 import Navbar from "../components/Navbar.jsx";
 import { useMaps } from "../context/MapsContext.jsx";
+import { useToast } from "../context/ToastContext.jsx";
 import {
   createMemory,
   updateMemory,
@@ -14,9 +15,10 @@ import styles from "./CreatePage.module.css";
 const MOODS = ["Nostalgic", "Travel", "Food", "Music"];
 
 export default function CreatePage() {
-  const { id } = useParams(); // present when editing
+  const { id } = useParams();
   const navigate = useNavigate();
   const { isLoaded } = useMaps();
+  const { showToast } = useToast();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [location, setLocation] = useState("");
@@ -27,10 +29,10 @@ export default function CreatePage() {
   const [lng, setLng] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+  const [dragging, setDragging] = useState(false);
 
   const autocompleteRef = useRef(null);
 
-  // If editing, pre-fill form
   useEffect(() => {
     if (!id) return;
     getMemory(id)
@@ -56,6 +58,25 @@ export default function CreatePage() {
     }
     const file = files[0];
     if (!file) return;
+    const dataUrl = await fileToDataUrl(file);
+    setImagePreview(dataUrl);
+    setImageDataUrl(dataUrl);
+  }
+
+  function handleDragOver(e) {
+    e.preventDefault();
+    setDragging(true);
+  }
+
+  function handleDragLeave() {
+    setDragging(false);
+  }
+
+  async function handleDrop(e) {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (!file || !file.type.startsWith("image/")) return;
     const dataUrl = await fileToDataUrl(file);
     setImagePreview(dataUrl);
     setImageDataUrl(dataUrl);
@@ -106,6 +127,7 @@ export default function CreatePage() {
         await createMemory(payload);
       }
 
+      showToast(id ? "Memory updated!" : "Memory saved!", "success");
       navigate("/");
     } catch (err) {
       setError(err.response?.data?.error ?? "Failed to save memory.");
@@ -126,7 +148,12 @@ export default function CreatePage() {
             {error && <p className={styles.error}>{error}</p>}
 
             {/* Image upload */}
-            <div className={styles.uploadArea}>
+            <div
+              className={`${styles.uploadArea} ${dragging ? styles.uploadDragging : ""}`}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+            >
               {imagePreview && (
                 <img
                   src={imagePreview}

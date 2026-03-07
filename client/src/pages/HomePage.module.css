@@ -20,20 +20,22 @@
   position: absolute;
   top: 1rem;
   left: 1rem;
-  background-color: #374869;
-  color: #fff;
-  border: none;
+  background-color: var(--color-surface);
+  color: var(--color-brand);
+  border: 2px solid var(--color-border);
   padding: 0.6rem 1.25rem;
-  border-radius: 0.5rem;
+  border-radius: var(--radius-md);
   font-size: 0.95rem;
+  font-weight: var(--font-weight-semibold);
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-  transition: opacity 0.2s;
+  box-shadow: var(--shadow-md);
+  transition: opacity var(--transition-base), transform var(--transition-base);
   z-index: 100;
 }
 
 .openSidebarBtn:hover {
-  opacity: 0.85;
+  opacity: 0.9;
+  transform: translateY(-1px);
 }
 
 .loading,
@@ -49,4 +51,30 @@
 
 .error {
   color: #c00;
+}
+
+.infoWindow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 120px;
+  max-width: 200px;
+}
+
+.infoWindowBadge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.infoWindowTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: #1e293b;
+  line-height: 1.3;
 }

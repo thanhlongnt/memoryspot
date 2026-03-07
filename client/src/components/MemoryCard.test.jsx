@@ -42,23 +42,24 @@ describe("MemoryCard", () => {
     expect(onEdit).toHaveBeenCalledWith("abc123");
   });
 
-  it("calls onDelete with memory id when delete is confirmed", () => {
+  it("calls onDelete with memory id when delete is confirmed in modal", () => {
     const onDelete = jest.fn();
-    window.confirm = jest.fn(() => true);
     render(
       <MemoryCard memory={MEMORY} onDelete={onDelete} onEdit={jest.fn()} />
     );
     fireEvent.click(screen.getByTitle("Delete"));
+    expect(screen.getByText("Are you sure you want to delete this memory?")).toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "Delete" }));
     expect(onDelete).toHaveBeenCalledWith("abc123");
   });
 
-  it("does not call onDelete when user cancels confirmation", () => {
+  it("does not call onDelete when user cancels the confirm modal", () => {
     const onDelete = jest.fn();
-    window.confirm = jest.fn(() => false);
     render(
       <MemoryCard memory={MEMORY} onDelete={onDelete} onEdit={jest.fn()} />
     );
     fireEvent.click(screen.getByTitle("Delete"));
+    fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
     expect(onDelete).not.toHaveBeenCalled();
   });
 

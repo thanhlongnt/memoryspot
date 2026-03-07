@@ -2,7 +2,9 @@ import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext.jsx";
 import { MapsProvider } from "./context/MapsContext.jsx";
+import { ToastProvider } from "./context/ToastContext.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
+import Toast from "./components/Toast.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
 import HomePage from "./pages/HomePage.jsx";
 import MemoriesPage from "./pages/MemoriesPage.jsx";
@@ -12,19 +14,22 @@ export default function App() {
   return (
     <AuthProvider>
       <MapsProvider>
-      <Routes>
-        <Route path="/login" element={<LoginPage />} />
+        <ToastProvider>
+          <Routes>
+            <Route path="/login" element={<LoginPage />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/memories" element={<MemoriesPage />} />
-          <Route path="/create" element={<CreatePage />} />
-          <Route path="/create/:id" element={<CreatePage />} />
-        </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/memories" element={<MemoriesPage />} />
+              <Route path="/create" element={<CreatePage />} />
+              <Route path="/create/:id" element={<CreatePage />} />
+            </Route>
 
-        {/* Catch-all → home */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+            {/* Catch-all → home */}
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Routes>
+          <Toast />
+        </ToastProvider>
       </MapsProvider>
     </AuthProvider>
   );

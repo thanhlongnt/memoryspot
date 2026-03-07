@@ -1,14 +1,19 @@
 .header {
   display: flex;
-  position: relative;
+  position: sticky;
+  top: 0;
   justify-content: space-between;
   align-items: center;
-  background-color: #374869;
+  background: rgba(55, 72, 105, 0.92);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   box-sizing: border-box;
-  padding: 0.5rem 2rem;
+  padding: 0 2rem;
   width: 100%;
+  height: var(--nav-height);
   z-index: 1000;
   color: #fff;
+  box-shadow: var(--shadow-sm);
 }
 
 .brand {
@@ -22,6 +27,7 @@
 .brand h1 {
   font-size: 1.5em;
   margin: 0.5rem;
+  letter-spacing: -0.02em;
 }
 
 .logo {
@@ -37,15 +43,17 @@
 .nav a {
   text-decoration: none;
   color: #fff;
-  font-weight: 650;
-  padding: 0.25rem 0.5rem;
+  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-sm);
+  text-transform: uppercase;
+  padding: 0.3rem 0.75rem;
   border: 2px solid transparent;
-  border-radius: 5px;
-  transition: background-color 0.2s;
+  border-radius: var(--radius-pill);
+  transition: background-color var(--transition-base);
 }
 
 .nav a:hover {
-  background-color: rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.18);
 }
 
 .userSection {
@@ -59,6 +67,7 @@
   height: 2rem;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.4);
 }
 
 .displayName {
@@ -70,10 +79,10 @@
   border: 2px solid #fff;
   color: #fff;
   padding: 0.25rem 0.75rem;
-  border-radius: 5px;
+  border-radius: var(--radius-pill);
   cursor: pointer;
   font-size: 0.85rem;
-  transition: background-color 0.2s;
+  transition: background-color var(--transition-base);
 }
 
 .logoutBtn:hover {
@@ -98,6 +107,25 @@
   height: 0.25rem;
   background: #fff;
   border-radius: 0.2rem;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+.hamburgerOpen span:nth-child(1) {
+  transform: translateY(0.65rem) rotate(45deg);
+}
+
+.hamburgerOpen span:nth-child(2) {
+  opacity: 0;
+  transform: scaleX(0);
+}
+
+.hamburgerOpen span:nth-child(3) {
+  transform: translateY(-0.65rem) rotate(-45deg);
+}
+
+.activeLink {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+  border-radius: 0 !important;
 }
 
 @media (max-width: 768px) {
@@ -108,12 +136,14 @@
   .nav {
     display: none;
     position: absolute;
-    top: 100%;
+    top: var(--nav-height);
     left: 0;
     right: 0;
     flex-direction: column;
     align-items: center;
-    background-color: #374869;
+    background: rgba(55, 72, 105, 0.96);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     padding: 1rem 0;
     gap: 1rem;
   }

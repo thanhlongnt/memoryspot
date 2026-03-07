@@ -31,15 +31,17 @@ router.get("/locations", async (req, res) => {
   try {
     const memories = await Memory.find(
       { userId: req.userId },
-      "latitude longitude title"
+      "latitude longitude title mood _id"
     ).lean();
 
     const coords = memories
       .filter((m) => m.latitude !== null && m.longitude !== null)
       .map((m) => ({
+        _id: m._id,
         latitude: m.latitude,
         longitude: m.longitude,
         title: m.title,
+        mood: m.mood,
       }));
 
     res.json(coords);

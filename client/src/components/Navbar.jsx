@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext.jsx";
 import styles from "./Navbar.module.css";
 
@@ -13,15 +13,19 @@ export default function Navbar() {
     navigate("/login");
   }
 
+  function navClass({ isActive }) {
+    return isActive ? styles.activeLink : undefined;
+  }
+
   return (
     <header className={styles.header}>
-      <Link to="/" className={styles.brand}>
+      <NavLink to="/" className={styles.brand}>
         <span className={styles.logo}>📍</span>
         <h1>MemorySpot</h1>
-      </Link>
+      </NavLink>
 
       <button
-        className={styles.hamburger}
+        className={`${styles.hamburger} ${menuOpen ? styles.hamburgerOpen : ""}`}
         onClick={() => setMenuOpen((o) => !o)}
         aria-label="Toggle menu"
       >
@@ -31,15 +35,15 @@ export default function Navbar() {
       </button>
 
       <nav className={`${styles.nav} ${menuOpen ? styles.open : ""}`}>
-        <Link to="/" onClick={() => setMenuOpen(false)}>
+        <NavLink to="/" end className={navClass} onClick={() => setMenuOpen(false)}>
           Map
-        </Link>
-        <Link to="/memories" onClick={() => setMenuOpen(false)}>
+        </NavLink>
+        <NavLink to="/memories" className={navClass} onClick={() => setMenuOpen(false)}>
           Memories
-        </Link>
-        <Link to="/create" onClick={() => setMenuOpen(false)}>
+        </NavLink>
+        <NavLink to="/create" className={navClass} onClick={() => setMenuOpen(false)}>
           + Add
-        </Link>
+        </NavLink>
 
         {user && (
           <div className={styles.userSection}>
@@ -52,10 +56,7 @@ export default function Navbar() {
               />
             )}
             <span className={styles.displayName}>{user.displayName}</span>
-            <button
-              className={styles.logoutBtn}
-              onClick={handleLogout}
-            >
+            <button className={styles.logoutBtn} onClick={handleLogout}>
               Sign Out
             </button>
           </div>

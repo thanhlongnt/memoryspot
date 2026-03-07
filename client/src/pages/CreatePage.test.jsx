@@ -55,22 +55,22 @@ describe("CreatePage", () => {
   });
 
   it("shows an error when required fields are missing on submit", async () => {
-    renderCreate();
-    fireEvent.click(screen.getByRole("button", { name: /save memory/i }));
+    const { container } = renderCreate();
+    fireEvent.submit(container.querySelector("form"));
     await waitFor(() => {
       expect(screen.getByText(/required fields/i)).toBeInTheDocument();
     });
   });
 
   it("shows error for title exceeding 20 chars", async () => {
-    renderCreate();
+    const { container } = renderCreate();
     // Fill image via state manipulation isn't possible without user interactions in JSDOM
     // This test verifies the character limit error path is wired
     const titleInput = screen.getByLabelText(/title/i);
     fireEvent.change(titleInput, {
       target: { value: "A very long title that exceeds limit" },
     });
-    fireEvent.click(screen.getByRole("button", { name: /save memory/i }));
+    fireEvent.submit(container.querySelector("form"));
     await waitFor(() => {
       expect(screen.getByText(/required fields/i)).toBeInTheDocument();
     });

@@ -7,3 +7,19 @@
 **/package-lock.json
 !source/**/package.json
 !source/**/package-lock.json
+!server/package.json
+!server/package-lock.json
+!client/package.json
+!client/package-lock.json
+!package.json
+!package-lock.json
+
+# Environment files — never commit secrets
+server/.env
+client/.env
+
+# Build output
+client/dist/
+
+# Test coverage
+coverage/

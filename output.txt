@@ -1,0 +1,52 @@
+
+> memoryspot@1.0.0 dev
+> concurrently -n server,client -c cyan,magenta "npm run dev --prefix server" "npm run dev --prefix client"
+
+[server] 
+[server] > memoryspot-server@1.0.0 dev
+[server] > nodemon index.js
+[server] 
+[client] 
+[client] > memoryspot-client@1.0.0 dev
+[client] > vite
+[client] 
+[server] [33m[nodemon] 3.1.14[39m
+[server] [33m[nodemon] to restart at any time, enter `rs`[39m
+[server] [33m[nodemon] watching path(s): *.*[39m
+[server] [33m[nodemon] watching extensions: js,mjs,cjs,json[39m
+[server] [32m[nodemon] starting `node index.js`[39m
+[client] 
+[client]   VITE v5.4.21  ready in 168 ms
+[client] 
+[client]   ➜  Local:   http://localhost:5173/
+[client]   ➜  Network: use --host to expose
+[server] node:internal/process/promises:332
+[server]     triggerUncaughtException(err, true /* fromPromise */);
+[server]     ^
+[server] 
+[server] MongoServerError: bad auth : authentication failed
+[server]     at Connection.sendCommand (/Users/thanhlongnt/Code/Projects/memoryspot/server/node_modules/mongodb/lib/cmap/connection.js:306:27)
+[server]     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+[server]     at async Connection.command (/Users/thanhlongnt/Code/Projects/memoryspot/server/node_modules/mongodb/lib/cmap/connection.js:334:26)
+[server]     at async continueScramConversation (/Users/thanhlongnt/Code/Projects/memoryspot/server/node_modules/mongodb/lib/cmap/auth/scram.js:131:15)
+[server]     at async executeScram (/Users/thanhlongnt/Code/Projects/memoryspot/server/node_modules/mongodb/lib/cmap/auth/scram.js:80:5)
+[server]     at async ScramSHA1.auth (/Users/thanhlongnt/Code/Projects/memoryspot/server/node_modules/mongodb/lib/cmap/auth/scram.js:39:16)
+[server]     at async performInitialHandshake (/Users/thanhlongnt/Code/Projects/memoryspot/server/node_modules/mongodb/lib/cmap/connect.js:104:13)
+[server]     at async connect (/Users/thanhlongnt/Code/Projects/memoryspot/server/node_modules/mongodb/lib/cmap/connect.js:24:9) {
+[server]   errorLabelSet: Set(2) { 'HandshakeError', 'ResetPool' },
+[server]   errorResponse: {
+[server]     ok: 0,
+[server]     errmsg: 'bad auth : authentication failed',
+[server]     code: 8000,
+[server]     codeName: 'AtlasError'
+[server]   },
+[server]   ok: 0,
+[server]   code: 8000,
+[server]   codeName: 'AtlasError',
+[server]   connectionGeneration: 0
+[server] }
+[server] 
+[server] Node.js v25.2.1
+[server] [31m[nodemon] app crashed - waiting for file changes before starting...[39m
+[server] npm run dev --prefix server exited with code SIGINT
+[client] npm run dev --prefix client exited with code SIGINT

@@ -1,108 +1,108 @@
-# 📍 MemorySpot — A Card-Based Location Sharing Web App
+# MemorySpot
 
-[Our Private Video](https://youtu.be/3VD4IaUe6MI)
-
-[Our Public Video](https://youtu.be/K_66NU2Qrik)
-
-## Project Overview
-
-This project was made for our CSE 110: Software Engineering Spring 2025 Course, under supervision of our Professor, Thomas Powell, and our TA, Devanshi Chadha. All developpers on this project were randomly assigned into this group in order for us to practice the AGILE practices that we learned in class. Since our experiences in development differ widely, the course staff have decided to restrict our project to **`LOCAL FIRST`** built with `Native Web-app Components` for a `CRUD` web-app.
-
-Due to the time constraints of this course, we were not able to fully all our intended features, most dissaponintingly using service workers to cache our application in case of a network cut-off. However, we have laid the foundation to do by choosing technologies that enable graceful degradation (for our crucial app features to function).
+A location-based memory journal web app. Pin memories to a map, attach photos and moods, and revisit them in a gallery view.
 
 ---
 
-## Application Overview
-**MemorySpot** allows users to create memory `cards` that include location data, descriptions, and images. These cards are displayed in conjunction with a map filled with markers to associate a `memory` with a `spot`.
+## Tech Stack
 
-## 🚀 Features
-
-- 📸 `Create`, `update`, and `delete` cards with title, image, description, mood, and geolocation
-- 🗺 View (`read`) all cards with or without a shared map with markers
-- 🔍 Filter memory cards based off of moods
-- 📱 Responsive design for desktop & mobile
+| Layer     | Tools                                              |
+| --------- | -------------------------------------------------- |
+| Front-End | React 18, React Router v6, Vite, CSS Modules       |
+| Back-End  | Node.js, Express, Mongoose (MongoDB)               |
+| Auth      | Google OAuth 2.0 (Passport.js) + JWT (httpOnly cookie) |
+| Maps      | Google Maps JavaScript API, Places API             |
+| Testing   | Jest + Supertest (server), Jest + React Testing Library (client) |
+| DevOps    | GitHub Actions, Prettier                           |
 
 ---
 
-## 🧪 Running the App:
+## Project Structure
 
-```bash
-git clone https://github.com/cse110-sp25-group24/cse110-sp25-group24.git
-cd cse110-sp25-group24/source
+```
+/
+├── server/          Express + MongoDB API
+├── client/          React + Vite frontend
+├── package.json     Root monorepo scripts
+└── onboard.md       Contributor guide
 ```
 
-and run on `live server` extension starting at `source/index.html`. Or, checkout our deployed page [here](https://cse110-sp25-group24.github.io/cse110-sp25-group24/)
+### Server (`server/`)
+- REST API at `/api/memories` (CRUD, auth-protected)
+- Google OAuth at `/auth/google` → JWT cookie on callback
+- Google Maps API key served at `GET /api/config`
+- Models: `User` (Google profile), `Memory` (title, description, image, location, mood, dateCreated)
 
-Since this project is restricted to `native web components`, we as a team have decided that you will need your own `Google Map API` key for security reasons. For more information on this decision, please reference this [ADR](./specs/adrs/all-decisions/06062025APIKeyADR.md). (Due to time constraints of the project, we were not able to follow through with our vision) 
-
- If you would like an API key, you can do one of the following: 
-
-1. Contact one of the Team Members to aquire a restricted api key.
-
-2. Make your own API key (for instructions on how to do so see below). Google Maps API offers a $300 free credit which is more than enough to run our project.
-
-## 🔑 Creating your own Google Maps API Key
-To make your own API key, navigate to the [Google Maps Platform](https://developers.google.com/maps). 
-
-Click `Get started` to navigate to the console, where you will be able to make your own API key. 
-
-Then, enable the the following APIs:
-* Maps JavaScript API
-* Places API
-* Places API (New)
-  
-These APIs allow for the creation of the map with its markers, and the autofill of the location in the memory create form.
+### Client (`client/src/`)
+- `AuthContext` — fetches `/auth/me` on mount, stores current user
+- `ProtectedRoute` — wraps all routes except `/login`
+- Pages: `LoginPage`, `HomePage` (map + sidebar), `MemoriesPage` (grid + mood filter), `CreatePage` (create/edit)
 
 ---
 
-## 📦 Tech Stack
+## Getting Started
 
-| Layer     | Tools / Libraries                         |
-| --------- | ----------------------------------------- |
-| Front-End | HTML, CSS, JavaScript                     |
-| APIs      | Google Maps API                           |
-| Storage   | IndexedDB + LocalStorage (LOCAL FIRST!)   |
-| Testing   | Jest + Babel + Puppeteer                  |
-| DevOps    | GitHub Actions, Prettier                  |
+### Prerequisites
+
+- Node.js 22.x
+- MongoDB Atlas account (or local MongoDB)
+- Google Cloud project with **Maps JavaScript API**, **Places API**, and **OAuth 2.0** credentials enabled
+
+### Setup
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/thanhlongnt/memoryspot.git
+   cd memoryspot
+   ```
+
+2. Install all dependencies:
+   ```bash
+   npm run install:all
+   ```
+
+3. Configure environment variables:
+
+   Create `server/.env` (see `server/.env.example`):
+   ```
+   MONGO_URI=mongodb+srv://...
+   GOOGLE_CLIENT_ID=...
+   GOOGLE_CLIENT_SECRET=...
+   JWT_SECRET=...
+   GOOGLE_MAPS_API_KEY=...
+   CLIENT_URL=http://localhost:5173
+   ```
+
+4. Start both server and client:
+   ```bash
+   npm run dev
+   ```
+
+   Server runs on `http://localhost:3000`, client on `http://localhost:5173`.
 
 ---
 
-Note: Node dependencies are not required to run the app, but are required for linting and testing in our CI/CD pipeline. 
+## Running Tests
 
-## 🤝 Contributing/Onboard
-To learn how to contribute, click [here](./onboard.md)
+```bash
+# All tests (server + client)
+npm test
 
-Note: we appologise for the large amount of tech debt and inconsistency in our efforts. This is a diverse team with a wide range of relevant skills in development and working experience. While some may have prefered to be 10x devs we wanted to allow the opportunity for our less experienced members to have a chance to learn and contribute; some devs seized this learning opportunity while others had different priorities, which led to procrastination of the project. 
+# Server tests only
+npm run test:server
 
---
-
-## 🧾 Documentation
-
-[Link to all method documentation.](https://cse110-sp25-group24.github.io/cse110-sp25-group24/docs/)
-
----
-
-## Running Tests / Instructions
-
-A few basic commands for running tests:
-
-1. Ensure `npm install` is run to install all dependencies in `package.json`first.
-2. To run a single test file, enter and run `npm test fileName.js` where 'fileName' is the test file you wish to run.
-3. In case of end-to-end ('e2e') tests, run `npm run test:e2e`.
-4. To run all test files at once, enter and run `npx jest`.
+# Client tests only
+npm run test:client
+```
 
 ---
 
-## 👥 Team Members & Roles
+## Deployment
 
-- William Widjaja (Co-Lead): Fullstack + QA + DevOps
-- Alexis Vega (Co-lead): UI/UX Designer + Front-end
-- Thanh-Long Nguyen Trong (TL): Fullstack + QA + DevOps
-- Eric Song: Backend
-- Myat Thiha: Backend
-- Aruthan Raveendra: Backend
-- Vincent Nguyen: QA
-- Noeh Parrales: Front-end + QA
-- Chris Enotiadis: Front-end + QA
-- Yilong Chen: Backend
-- Phiroze Duggal 
+| Service  | Target                        | Notes                                   |
+| -------- | ----------------------------- | --------------------------------------- |
+| Server   | Render or Railway             | Set env vars from `server/.env.example` |
+| Client   | Vercel or Netlify             | Set `VITE_API_URL` to deployed server URL |
+| Database | MongoDB Atlas                 |                                         |
+
+---

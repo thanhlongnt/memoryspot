@@ -1,11 +1,19 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import {
+  Box,
+  Typography,
+  ToggleButtonGroup,
+  ToggleButton,
+  Fab,
+  CircularProgress,
+  Button,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import PhotoCameraIcon from "@mui/icons-material/PhotoCamera";
 import Navbar from "../components/Navbar.jsx";
 import MemoryGrid from "../components/MemoryGrid.jsx";
-import Spinner from "../components/Spinner.jsx";
 import { getAllMemories, deleteMemory } from "../api/memories.js";
 import { useToast } from "../context/ToastContext.jsx";
-import styles from "./MemoriesPage.module.css";
 
 const MOODS = ["All Moods", "Nostalgic", "Travel", "Food", "Music"];
 
@@ -16,11 +24,10 @@ const MOOD_COLORS = {
   Music: "#2496ff",
 };
 
-export default function MemoriesPage() {
+export default function MemoriesPage({ onOpenCreate, onOpenEdit, refreshKey }) {
   const [memories, setMemories] = useState([]);
   const [mood, setMood] = useState("All Moods");
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate();
   const { showToast } = useToast();
 
   const load = useCallback(async (selectedMood) => {
@@ -38,7 +45,7 @@ export default function MemoriesPage() {
 
   useEffect(() => {
     load(mood);
-  }, [mood, load]);
+  }, [mood, load, refreshKey]);
 
   const handleDelete = useCallback(
     async (id) => {
@@ -49,63 +56,76 @@ export default function MemoriesPage() {
     [showToast]
   );
 
-  const handleEdit = useCallback(
-    (id) => navigate(`/create/${id}`),
-    [navigate]
-  );
-
   return (
-    <div className={styles.page}>
+    <Box sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
       <Navbar />
 
-      <main className={styles.main}>
-        <header className={styles.header}>
-          <h1 className={styles.title}>My Memories</h1>
+      <Box component="main" sx={{ flexGrow: 1, p: 3, maxWidth: 1200, mx: "auto", width: "100%" }}>
+        <Typography variant="h4" sx={{ fontWeight: 800, mb: 2 }}>
+          My Memories
+        </Typography>
 
-          <div className={styles.moodChips}>
-            {MOODS.map((m) => {
-              const isActive = mood === m;
-              const color = MOOD_COLORS[m];
-              return (
-                <button
-                  key={m}
-                  className={`${styles.chip} ${isActive ? styles.chipActive : ""}`}
-                  style={
-                    color
-                      ? isActive
-                        ? { backgroundColor: color, borderColor: color }
-                        : { borderColor: color, color }
-                      : {}
-                  }
-                  onClick={() => setMood(m)}
-                >
-                  {m}
-                </button>
-              );
-            })}
-          </div>
-        </header>
+        {/* Mood filter */}
+        <ToggleButtonGroup
+          value={mood}
+          exclusive
+          onChange={(_, val) => val && setMood(val)}
+          sx={{ mb: 3, flexWrap: "wrap", gap: 0.5 }}
+        >
+          {MOODS.map((m) => (
+            <ToggleButton
+              key={m}
+              value={m}
+              size="small"
+              sx={{
+                borderRadius: "20px !important",
+                border: "1.5px solid",
+                borderColor: MOOD_COLORS[m] ?? "primary.main",
+                color: MOOD_COLORS[m] ?? "primary.main",
+                fontWeight: 600,
+                px: 2,
+                "&.Mui-selected": {
+                  bgcolor: MOOD_COLORS[m] ?? "primary.main",
+                  color: "#fff",
+                  borderColor: MOOD_COLORS[m] ?? "primary.main",
+                  "&:hover": {
+                    bgcolor: MOOD_COLORS[m] ?? "primary.main",
+                  },
+                },
+              }}
+            >
+              {m}
+            </ToggleButton>
+          ))}
+        </ToggleButtonGroup>
 
         {loading ? (
-          <Spinner />
+          <Box sx={{ display: "flex", justifyContent: "center", mt: 8 }}>
+            <CircularProgress />
+          </Box>
         ) : memories.length === 0 ? (
-          <div className={styles.emptyState}>
-            <span className={styles.emptyIcon}>📸</span>
-            <p>No memories yet. Start capturing your moments!</p>
-            <Link to="/create" className={styles.addLink}>
-              + Add Memory
-            </Link>
-          </div>
+          <Box sx={{ textAlign: "center", mt: 8 }}>
+            <PhotoCameraIcon sx={{ fontSize: 64, color: "text.disabled", mb: 2 }} />
+            <Typography color="text.secondary" gutterBottom>
+              No memories yet. Start capturing your moments!
+            </Typography>
+            <Button variant="contained" startIcon={<AddIcon />} onClick={onOpenCreate}>
+              Add Memory
+            </Button>
+          </Box>
         ) : (
-          <div className={styles.gridWrapper}>
-            <MemoryGrid
-              memories={memories}
-              onDelete={handleDelete}
-              onEdit={handleEdit}
-            />
-          </div>
+          <MemoryGrid memories={memories} onDelete={handleDelete} onEdit={onOpenEdit} />
         )}
-      </main>
-    </div>
+      </Box>
+
+      <Fab
+        color="primary"
+        aria-label="Add memory"
+        onClick={onOpenCreate}
+        sx={{ position: "fixed", bottom: 24, right: 24 }}
+      >
+        <AddIcon />
+      </Fab>
+    </Box>
   );
 }

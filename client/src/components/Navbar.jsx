@@ -1,67 +1,143 @@
 import React, { useState } from "react";
-import { NavLink, useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  Button,
+  Avatar,
+  IconButton,
+  Menu,
+  MenuItem,
+  Tabs,
+  Tab,
+  Box,
+  useMediaQuery,
+  useTheme,
+} from "@mui/material";
+import MenuIcon from "@mui/icons-material/Menu";
+import MapIcon from "@mui/icons-material/Map";
+import PhotoLibraryIcon from "@mui/icons-material/PhotoLibrary";
 import { useAuth } from "../context/AuthContext.jsx";
-import styles from "./Navbar.module.css";
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
-  const [menuOpen, setMenuOpen] = useState(false);
+  const location = useLocation();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [userMenuAnchor, setUserMenuAnchor] = useState(null);
 
   async function handleLogout() {
+    setUserMenuAnchor(null);
     await logout();
     navigate("/login");
   }
 
-  function navClass({ isActive }) {
-    return isActive ? styles.activeLink : undefined;
-  }
+  const currentTab = location.pathname === "/memories" ? "/memories" : "/";
 
   return (
-    <header className={styles.header}>
-      <NavLink to="/" className={styles.brand}>
-        <span className={styles.logo}>📍</span>
-        <h1>MemorySpot</h1>
-      </NavLink>
+    <AppBar position="sticky" color="primary">
+      <Toolbar>
+        {/* Brand */}
+        <Typography
+          variant="h6"
+          component="div"
+          sx={{ fontWeight: 800, cursor: "pointer", mr: 2, letterSpacing: "-0.5px" }}
+          onClick={() => navigate("/")}
+        >
+          📍 MemorySpot
+        </Typography>
 
-      <button
-        className={`${styles.hamburger} ${menuOpen ? styles.hamburgerOpen : ""}`}
-        onClick={() => setMenuOpen((o) => !o)}
-        aria-label="Toggle menu"
-      >
-        <span />
-        <span />
-        <span />
-      </button>
-
-      <nav className={`${styles.nav} ${menuOpen ? styles.open : ""}`}>
-        <NavLink to="/" end className={navClass} onClick={() => setMenuOpen(false)}>
-          Map
-        </NavLink>
-        <NavLink to="/memories" className={navClass} onClick={() => setMenuOpen(false)}>
-          Memories
-        </NavLink>
-        <NavLink to="/create" className={navClass} onClick={() => setMenuOpen(false)}>
-          + Add
-        </NavLink>
-
-        {user && (
-          <div className={styles.userSection}>
-            {user.profilePicture && (
-              <img
-                src={user.profilePicture}
-                alt={user.displayName}
-                className={styles.avatar}
-                referrerPolicy="no-referrer"
+        {isMobile ? (
+          <>
+            <Box sx={{ flexGrow: 1 }} />
+            <IconButton
+              color="inherit"
+              onClick={(e) => setAnchorEl(e.currentTarget)}
+              aria-label="Open menu"
+            >
+              <MenuIcon />
+            </IconButton>
+            <Menu
+              anchorEl={anchorEl}
+              open={Boolean(anchorEl)}
+              onClose={() => setAnchorEl(null)}
+            >
+              <MenuItem
+                selected={currentTab === "/"}
+                onClick={() => { navigate("/"); setAnchorEl(null); }}
+              >
+                Map
+              </MenuItem>
+              <MenuItem
+                selected={currentTab === "/memories"}
+                onClick={() => { navigate("/memories"); setAnchorEl(null); }}
+              >
+                Memories
+              </MenuItem>
+              {user && (
+                <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
+              )}
+            </Menu>
+          </>
+        ) : (
+          <>
+            <Tabs
+              value={currentTab}
+              textColor="inherit"
+              TabIndicatorProps={{ style: { backgroundColor: "#fff" } }}
+              sx={{ flexGrow: 1 }}
+            >
+              <Tab
+                label="Map"
+                value="/"
+                icon={<MapIcon fontSize="small" />}
+                iconPosition="start"
+                onClick={() => navigate("/")}
+                sx={{ minHeight: 48, fontWeight: 600 }}
               />
+              <Tab
+                label="Memories"
+                value="/memories"
+                icon={<PhotoLibraryIcon fontSize="small" />}
+                iconPosition="start"
+                onClick={() => navigate("/memories")}
+                sx={{ minHeight: 48, fontWeight: 600 }}
+              />
+            </Tabs>
+
+            {user && (
+              <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <IconButton
+                  onClick={(e) => setUserMenuAnchor(e.currentTarget)}
+                  sx={{ p: 0.5 }}
+                >
+                  <Avatar
+                    src={user.profilePicture}
+                    alt={user.displayName}
+                    sx={{ width: 32, height: 32 }}
+                    referrerPolicy="no-referrer"
+                  />
+                </IconButton>
+                <Menu
+                  anchorEl={userMenuAnchor}
+                  open={Boolean(userMenuAnchor)}
+                  onClose={() => setUserMenuAnchor(null)}
+                >
+                  <MenuItem disabled>
+                    <Typography variant="body2" color="text.secondary">
+                      {user.displayName}
+                    </Typography>
+                  </MenuItem>
+                  <MenuItem onClick={handleLogout}>Sign Out</MenuItem>
+                </Menu>
+              </Box>
             )}
-            <span className={styles.displayName}>{user.displayName}</span>
-            <button className={styles.logoutBtn} onClick={handleLogout}>
-              Sign Out
-            </button>
-          </div>
+          </>
         )}
-      </nav>
-    </header>
+      </Toolbar>
+    </AppBar>
   );
 }

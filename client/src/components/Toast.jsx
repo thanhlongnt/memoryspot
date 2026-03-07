@@ -1,14 +1,27 @@
 import React from "react";
+import Snackbar from "@mui/material/Snackbar";
+import Alert from "@mui/material/Alert";
 import { useToast } from "../context/ToastContext.jsx";
-import styles from "./Toast.module.css";
 
 export default function Toast() {
   const { toast } = useToast();
-  if (!toast) return null;
 
   return (
-    <div className={`${styles.toast} ${styles[toast.type]}`} role="status">
-      {toast.message}
-    </div>
+    <Snackbar
+      open={Boolean(toast)}
+      anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+    >
+      {toast ? (
+        <Alert
+          severity={toast.type === "error" ? "error" : "success"}
+          variant="filled"
+          sx={{ minWidth: 240 }}
+        >
+          {toast.message}
+        </Alert>
+      ) : (
+        <span />
+      )}
+    </Snackbar>
   );
 }

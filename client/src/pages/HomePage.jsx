@@ -1,12 +1,22 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useNavigate } from "react-router-dom";
 import { GoogleMap, MarkerF, InfoWindowF } from "@react-google-maps/api";
+import {
+  Box,
+  Typography,
+  Chip,
+  Fab,
+  CircularProgress,
+  Paper,
+  IconButton,
+} from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
 import Navbar from "../components/Navbar.jsx";
-import Sidebar from "../components/Sidebar.jsx";
-import Spinner from "../components/Spinner.jsx";
+import ConfirmModal from "../components/ConfirmModal.jsx";
 import { useMaps } from "../context/MapsContext.jsx";
-import { getAllLocations, getAllMemories, deleteMemory } from "../api/memories.js";
-import styles from "./HomePage.module.css";
+import { getAllLocations, deleteMemory } from "../api/memories.js";
+import { useToast } from "../context/ToastContext.jsx";
 
 const MAP_CENTER = { lat: 32.8802, lng: -117.2392 };
 const MAP_OPTIONS = {
@@ -37,49 +47,48 @@ function getMoodMarkerIcon(mood) {
   };
 }
 
-export default function HomePage() {
+export default function HomePage({ onOpenCreate, onOpenEdit, refreshKey }) {
   const { isLoaded, noKey } = useMaps();
   const [markers, setMarkers] = useState([]);
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [memories, setMemories] = useState([]);
   const [activeMarker, setActiveMarker] = useState(null);
-  const navigate = useNavigate();
+  const [confirmDeleteId, setConfirmDeleteId] = useState(null);
+  const { showToast } = useToast();
 
   useEffect(() => {
     getAllLocations().then(setMarkers).catch(console.error);
-  }, []);
+  }, [refreshKey]);
 
-  useEffect(() => {
-    if (sidebarOpen) {
-      getAllMemories().then(setMemories).catch(console.error);
-    }
-  }, [sidebarOpen]);
-
-  const handleDelete = useCallback(async (id) => {
-    await deleteMemory(id);
-    setMemories((prev) => prev.filter((m) => m._id !== id));
-    setMarkers((prev) => prev.filter((m) => m._id !== id));
-  }, []);
-
-  const handleEdit = useCallback((id) => navigate(`/create/${id}`), [navigate]);
+  const handleDelete = useCallback(async () => {
+    if (!confirmDeleteId) return;
+    await deleteMemory(confirmDeleteId);
+    setMarkers((prev) => prev.filter((m) => m._id !== confirmDeleteId));
+    setActiveMarker(null);
+    setConfirmDeleteId(null);
+    showToast("Memory deleted", "success");
+  }, [confirmDeleteId, showToast]);
 
   return (
-    <div className={styles.page}>
+    <Box sx={{ display: "flex", flexDirection: "column", height: "100vh" }}>
       <Navbar />
 
-      <main className={styles.main}>
+      <Box component="main" sx={{ flexGrow: 1, position: "relative", overflow: "hidden" }}>
         {noKey && (
-          <p className={styles.info}>
-            Set <code>GOOGLE_MAPS_API_KEY</code> in <code>server/.env</code> to
-            enable the map.
-          </p>
+          <Box sx={{ p: 3 }}>
+            <Typography color="text.secondary">
+              Set <code>GOOGLE_MAPS_API_KEY</code> in <code>server/.env</code> to enable the map.
+            </Typography>
+          </Box>
         )}
 
-        {!isLoaded && !noKey && <Spinner />}
+        {!isLoaded && !noKey && (
+          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "100%" }}>
+            <CircularProgress />
+          </Box>
+        )}
 
         {isLoaded && (
           <GoogleMap
-            mapContainerClassName={styles.map}
+            mapContainerStyle={{ width: "100%", height: "100%" }}
             center={MAP_CENTER}
             zoom={10}
             options={MAP_OPTIONS}
@@ -100,39 +109,57 @@ export default function HomePage() {
                 onCloseClick={() => setActiveMarker(null)}
                 options={{ pixelOffset: new window.google.maps.Size(0, -38) }}
               >
-                <div className={styles.infoWindow}>
-                  <span
-                    className={styles.infoWindowBadge}
-                    style={{
-                      backgroundColor:
-                        MOOD_COLORS[activeMarker.mood] ?? MOOD_COLORS.default,
+                <Paper elevation={0} sx={{ p: 0.5, minWidth: 160 }}>
+                  <Chip
+                    label={activeMarker.mood}
+                    size="small"
+                    sx={{
+                      bgcolor: MOOD_COLORS[activeMarker.mood] ?? MOOD_COLORS.default,
+                      color: "#fff",
+                      fontWeight: 700,
+                      mb: 0.5,
                     }}
-                  >
-                    {activeMarker.mood}
-                  </span>
-                  <p className={styles.infoWindowTitle}>{activeMarker.title}</p>
-                </div>
+                  />
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700, mb: 0.5 }}>
+                    {activeMarker.title}
+                  </Typography>
+                  <Box sx={{ display: "flex", gap: 0.5 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => { setActiveMarker(null); onOpenEdit(activeMarker._id); }}
+                    >
+                      <EditIcon fontSize="small" color="primary" />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => setConfirmDeleteId(activeMarker._id)}
+                    >
+                      <DeleteIcon fontSize="small" color="error" />
+                    </IconButton>
+                  </Box>
+                </Paper>
               </InfoWindowF>
             )}
           </GoogleMap>
         )}
 
-        <button
-          className={styles.openSidebarBtn}
-          onClick={() => setSidebarOpen(true)}
-          aria-label="Open memories sidebar"
+        <Fab
+          color="primary"
+          aria-label="Add memory"
+          onClick={onOpenCreate}
+          sx={{ position: "absolute", bottom: 24, right: 24 }}
         >
-          Memories
-        </button>
-      </main>
+          <AddIcon />
+        </Fab>
+      </Box>
 
-      <Sidebar
-        memories={memories}
-        isOpen={sidebarOpen}
-        onClose={() => setSidebarOpen(false)}
-        onDelete={handleDelete}
-        onEdit={handleEdit}
-      />
-    </div>
+      {confirmDeleteId && (
+        <ConfirmModal
+          message="Are you sure you want to delete this memory?"
+          onConfirm={handleDelete}
+          onCancel={() => setConfirmDeleteId(null)}
+        />
+      )}
+    </Box>
   );
 }

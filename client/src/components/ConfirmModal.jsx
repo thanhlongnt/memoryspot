@@ -1,20 +1,26 @@
 import React from "react";
-import styles from "./ConfirmModal.module.css";
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
+  Button,
+} from "@mui/material";
 
 export default function ConfirmModal({ message, onConfirm, onCancel }) {
   return (
-    <div className={styles.overlay} onClick={onCancel}>
-      <div className={styles.dialog} onClick={(e) => e.stopPropagation()}>
-        <p className={styles.message}>{message}</p>
-        <div className={styles.actions}>
-          <button className={styles.cancelBtn} onClick={onCancel}>
-            Cancel
-          </button>
-          <button className={styles.deleteBtn} onClick={onConfirm}>
-            Delete
-          </button>
-        </div>
-      </div>
-    </div>
+    <Dialog open onClose={onCancel} maxWidth="xs" fullWidth>
+      <DialogTitle>Confirm Delete</DialogTitle>
+      <DialogContent>
+        <DialogContentText>{message}</DialogContentText>
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onCancel}>Cancel</Button>
+        <Button onClick={onConfirm} color="error" variant="contained">
+          Delete
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 }

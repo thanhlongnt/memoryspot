@@ -1,26 +1,24 @@
 import React from "react";
+import Grid from "@mui/material/Grid";
+import Typography from "@mui/material/Typography";
 import MemoryCard from "./MemoryCard.jsx";
-import styles from "./MemoryGrid.module.css";
 
 export default function MemoryGrid({ memories, onDelete, onEdit }) {
   if (memories.length === 0) {
     return (
-      <p className={styles.empty}>
-        No memories yet. <a href="/create">Add your first one!</a>
-      </p>
+      <Typography color="text.secondary" sx={{ mt: 4, textAlign: "center" }}>
+        No memories yet.
+      </Typography>
     );
   }
 
   return (
-    <div className={styles.grid}>
+    <Grid container spacing={2}>
       {memories.map((memory) => (
-        <MemoryCard
-          key={memory._id}
-          memory={memory}
-          onDelete={onDelete}
-          onEdit={onEdit}
-        />
+        <Grid key={memory._id} size={{ xs: 12, sm: 6, md: 4 }}>
+          <MemoryCard memory={memory} onDelete={onDelete} onEdit={onEdit} />
+        </Grid>
       ))}
-    </div>
+    </Grid>
   );
 }

@@ -1,5 +1,8 @@
 module.exports = {
   testEnvironment: "node",
-  testMatch: ["**/tests/**/*.test.js"],
+  testMatch: ["**/tests/**/*.test.ts"],
   testTimeout: 30000,
+  transform: {
+    "^.+\\.ts$": ["ts-jest", { tsconfig: "tsconfig.test.json" }],
+  },
 };

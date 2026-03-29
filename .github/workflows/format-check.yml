@@ -5,22 +5,42 @@ on:
     branches: [main]
 
 jobs:
-  format-check:
+  format-check-server:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: "22"
 
       - name: Install dependencies
-        working-directory: ./source
-        run: npm ci
+        working-directory: ./server
+        run: npm install
 
       - name: Run Prettier Check
-        working-directory: ./source
+        working-directory: ./server
+        run: npx prettier . --check
+
+  format-check-client:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Run Prettier Check
+        working-directory: ./client
         run: npx prettier . --check

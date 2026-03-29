@@ -1,4 +1,4 @@
-name: Build and Deploy to GitHub Pages
+name: Build Client
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build-deploy:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -18,23 +18,16 @@ jobs:
         with:
           node-version: "22.x"
 
-      - name: Install dependencies
-        working-directory: ./source
+      - name: Install client dependencies
+        working-directory: ./client
         run: npm install
 
-      - name: Generate JSDoc
-        working-directory: ./source
-        run: npm run docs
+      - name: Typecheck
+        working-directory: ./client
+        run: npm run typecheck
 
-      - name: Prepare deploy directory
-        run: |
-          mkdir deploy
-          cp -r source/* deploy/
-          cp -r source/docs deploy/docs
-
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./deploy
-          force_orphan: true
+      - name: Build
+        working-directory: ./client
+        run: npm run build
+        env:
+          VITE_API_URL: ${{ secrets.VITE_API_URL }}

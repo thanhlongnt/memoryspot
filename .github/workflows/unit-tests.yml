@@ -7,26 +7,50 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  test-server:
     runs-on: ubuntu-latest
-
-    strategy:
-      matrix:
-        node-version: [22.x]
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: "22.x"
 
       - name: Install dependencies
-        working-directory: ./source
-        run: npm install --save-dev jest
+        working-directory: ./server
+        run: npm install
+
+      - name: Typecheck
+        working-directory: ./server
+        run: npm run typecheck
 
       - name: Run tests
-        working-directory: ./source
+        working-directory: ./server
+        run: npm test
+
+  test-client:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22.x"
+
+      - name: Install dependencies
+        working-directory: ./client
+        run: npm install
+
+      - name: Typecheck
+        working-directory: ./client
+        run: npm run typecheck
+
+      - name: Run tests
+        working-directory: ./client
         run: npm test
